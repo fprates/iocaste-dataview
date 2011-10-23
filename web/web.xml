@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<web-app id="iocaste_tests" xmlns="http://java.sun.com/xml/ns/javaee"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+   version="2.5"> 
+    <description>Data Viewer</description>
+    <display-name>Data Viewer</display-name>
+    
+    <servlet>
+        <servlet-name>iocaste_server</servlet-name>
+        <servlet-class>@server.class@</servlet-class>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>iocaste_server</servlet-name>
+        <url-pattern>/services.html</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>iocaste_servlet</servlet-name>
+        <servlet-class>org.iocaste.shell.common.IocasteServlet</servlet-class>
+        <init-param>
+            <param-name>form</param-name>
+            <param-value>org.iocaste.dataview.MainForm</param-value>
+        </init-param>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>iocaste_servlet</servlet-name>
+        <url-pattern>/view.html</url-pattern>
+    </servlet-mapping>
+    
+    <listener>
+        <listener-class>org.iocaste.protocol.HibernateListener</listener-class>
+    </listener>
+    
+    <filter>
+        <filter-name>HibernateFilter</filter-name>
+        <filter-class>org.iocaste.protocol.HibernateSessionRequestFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>HibernateFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    
+    <resource-ref>
+        <description>iocaste db access</description>
+        <res-ref-name>jdbc/iocaste</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <res-auth>Container</res-auth>
+    </resource-ref>
+    
+    <welcome-file-list>
+        <welcome-file>index.xhtml</welcome-file>
+    </welcome-file-list>
+</web-app>
