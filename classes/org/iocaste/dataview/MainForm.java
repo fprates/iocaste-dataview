@@ -12,6 +12,7 @@ import org.iocaste.shell.common.DataItem;
 import org.iocaste.shell.common.Element;
 import org.iocaste.shell.common.Form;
 import org.iocaste.shell.common.InputComponent;
+import org.iocaste.shell.common.Shell;
 import org.iocaste.shell.common.Table;
 import org.iocaste.shell.common.TableItem;
 import org.iocaste.shell.common.ViewData;
@@ -43,7 +44,7 @@ public class MainForm extends AbstractPage {
         Element[] elements;
         boolean key;
         int i = 0;
-//        Object[] itens = dataview.getItens();
+        Object[] itens = (Object[])view.getParameter("model.regs");
         Documents documents = new Documents(this);
         DocumentModel model = documents.getModel(
                 (String)view.getParameter("model.name"));
@@ -79,32 +80,39 @@ public class MainForm extends AbstractPage {
                 dataitem = (DataItem)element;
                 dataitem.setModelItem(modelitem);
                 
-//                tfield = createInputItem(dataitem, sb.append(name).append(".").
-//                        append(element.getName()).toString());
-//                tfield.setEnabled(!model.isKey(modelitem));
-//                
-//                tableitem.add(tfield);
-//                
-//                if (k < itens.length)
-//                    moveItemToInput((InputComponent)tfield, itens[k]);
+                tfield = Shell.createInputItem(dataitem, sb.append(name).append(".").
+                        append(element.getName()).toString());
+                tfield.setEnabled(!model.isKey(modelitem));
+                
+                tableitem.add(tfield);
+                
+                if (k < itens.length)
+                    Shell.moveItemToInput((InputComponent)tfield, itens[k]);
             }
         }
         
         view.addContainer(container);
     }
     
-    public final void edit(ControlData controldata, ViewData view) {
-        String model = ((InputComponent)view.getElement("model.name")).getValue();
+    public final void edit(ControlData controldata, ViewData view) 
+            throws Exception {
+        String modelname = ((InputComponent)view.getElement("model.name")).
+                getValue();
+        Documents documents = new Documents(this);
+        String query = new StringBuilder("select * from ").
+                append(modelname).toString();
         
         controldata.clearParameters();
         controldata.addParameter("mode", "edit");
         controldata.addParameter("view.type", Const.DETAILED);
-        controldata.addParameter("model.name", model);
+        controldata.addParameter("model.name", modelname);
+        controldata.addParameter("model.regs", documents.select(query, null));
         controldata.redirect(null, "select");
     }
     
     public final void show(ControlData controldata, ViewData view) {
-        String model = ((InputComponent)view.getElement("model.name")).getValue();
+        String model = ((InputComponent)view.getElement("model.name")).
+                getValue();
         
         controldata.clearParameters();
         controldata.addParameter("mode", "show");
