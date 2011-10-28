@@ -1,5 +1,7 @@
 package org.iocaste.dataview;
 
+import java.lang.reflect.Method;
+
 import org.iocaste.documents.common.DocumentModel;
 import org.iocaste.documents.common.DocumentModelItem;
 import org.iocaste.documents.common.Documents;
@@ -19,6 +21,38 @@ import org.iocaste.shell.common.TableItem;
 import org.iocaste.shell.common.ViewData;
 
 public class MainForm extends AbstractPage {
+    
+    public final void earlierpage(ControlData cdata, ViewData vdata) {
+        
+    }
+    
+    public final void edit(ControlData controldata, ViewData view) 
+            throws Exception {
+        String modelname = ((InputComponent)view.getElement("model.name")).
+                getValue();
+        Documents documents = new Documents(this);
+        String query = new StringBuilder("select * from ").
+                append(modelname).toString();
+        
+        controldata.clearParameters();
+        controldata.addParameter("mode", "edit");
+        controldata.addParameter("view.type", Const.SINGLE);
+        controldata.addParameter("model.name", modelname);
+        controldata.addParameter("model.regs", documents.select(query, null));
+        controldata.redirect(null, "select");
+    }
+    
+    public final void firstpage(ControlData cdata, ViewData vdata) {
+        
+    }
+    
+    public final void lastpage(ControlData cdata, ViewData vdata) {
+        
+    }
+    
+    public final void laterpage(ControlData cdata, ViewData vdata) {
+        
+    }
 
     public void main(ViewData view) {
         Container container = new Form(null, "main");
@@ -34,6 +68,38 @@ public class MainForm extends AbstractPage {
         view.addContainer(container);
     }
     
+    public final void save(ControlData cdata, ViewData vdata) throws Exception {
+        TableItem tableitem;
+        Object reg;
+        InputComponent input;
+        DocumentModelItem modelitem;
+        Method method;
+        String modelname = (String)vdata.getParameter("modelname");
+        Documents documents = new Documents(this);
+        DocumentModel model = documents.getModel(modelname);
+        Table table = ((Table)vdata.getElement(modelname));
+        
+        for (Element element : table.getElements()) {
+            if (element.getType() != Const.TABLE_ITEM)
+                continue;
+            
+            tableitem = (TableItem)element;
+            reg = Class.forName(model.getClassName()).newInstance();
+            for (Element column : tableitem.getElements()) {
+                if (!column.isDataStorable())
+                    continue;
+                
+                input = (InputComponent)column;
+                modelitem = input.getModelItem();
+                method = reg.getClass().getMethod(modelitem.getSetterName(),
+                        modelitem.getDataElement().getClassType());
+                method.invoke(reg, input.getParsedValue());
+            }
+            
+            documents.modify(model, reg);
+        }
+    }
+    
     public void select(ViewData view) throws Exception {
         Container container = new Form(null, "dataview.container");
         DataItem dataitem;
@@ -41,7 +107,6 @@ public class MainForm extends AbstractPage {
         String name;
         StringBuilder sb;
         Element tfield;
-        Button save;
         Element element;
         Element[] elements;
         boolean key;
@@ -100,42 +165,6 @@ public class MainForm extends AbstractPage {
         new Button(container, "lastpage").setSubmit(true);
         
         view.addContainer(container);
-    }
-    
-    public final void earlierpage(ControlData cdata, ViewData vdata) {
-        
-    }
-    
-    public final void edit(ControlData controldata, ViewData view) 
-            throws Exception {
-        String modelname = ((InputComponent)view.getElement("model.name")).
-                getValue();
-        Documents documents = new Documents(this);
-        String query = new StringBuilder("select * from ").
-                append(modelname).toString();
-        
-        controldata.clearParameters();
-        controldata.addParameter("mode", "edit");
-        controldata.addParameter("view.type", Const.SINGLE);
-        controldata.addParameter("model.name", modelname);
-        controldata.addParameter("model.regs", documents.select(query, null));
-        controldata.redirect(null, "select");
-    }
-    
-    public final void firstpage(ControlData cdata, ViewData vdata) {
-        
-    }
-    
-    public final void lastpage(ControlData cdata, ViewData vdata) {
-        
-    }
-    
-    public final void laterpage(ControlData cdata, ViewData vdata) {
-        
-    }
-    
-    public final void save(ControlData cdata, ViewData vdata) {
-        
     }
     
     public final void show(ControlData controldata, ViewData view) {
