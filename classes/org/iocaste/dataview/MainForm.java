@@ -4,6 +4,7 @@ import org.iocaste.documents.common.DocumentModel;
 import org.iocaste.documents.common.DocumentModelItem;
 import org.iocaste.documents.common.Documents;
 import org.iocaste.shell.common.AbstractPage;
+import org.iocaste.shell.common.Button;
 import org.iocaste.shell.common.Const;
 import org.iocaste.shell.common.Container;
 import org.iocaste.shell.common.ControlData;
@@ -40,6 +41,7 @@ public class MainForm extends AbstractPage {
         String name;
         StringBuilder sb;
         Element tfield;
+        Button save;
         Element element;
         Element[] elements;
         boolean key;
@@ -91,7 +93,17 @@ public class MainForm extends AbstractPage {
             }
         }
         
+        new Button(container, "save").setSubmit(true);
+        new Button(container, "firstpage").setSubmit(true);
+        new Button(container, "earlierpage").setSubmit(true);
+        new Button(container, "laterpage").setSubmit(true);
+        new Button(container, "lastpage").setSubmit(true);
+        
         view.addContainer(container);
+    }
+    
+    public final void earlierpage(ControlData cdata, ViewData vdata) {
+        
     }
     
     public final void edit(ControlData controldata, ViewData view) 
@@ -104,10 +116,26 @@ public class MainForm extends AbstractPage {
         
         controldata.clearParameters();
         controldata.addParameter("mode", "edit");
-        controldata.addParameter("view.type", Const.DETAILED);
+        controldata.addParameter("view.type", Const.SINGLE);
         controldata.addParameter("model.name", modelname);
         controldata.addParameter("model.regs", documents.select(query, null));
         controldata.redirect(null, "select");
+    }
+    
+    public final void firstpage(ControlData cdata, ViewData vdata) {
+        
+    }
+    
+    public final void lastpage(ControlData cdata, ViewData vdata) {
+        
+    }
+    
+    public final void laterpage(ControlData cdata, ViewData vdata) {
+        
+    }
+    
+    public final void save(ControlData cdata, ViewData vdata) {
+        
     }
     
     public final void show(ControlData controldata, ViewData view) {
@@ -116,7 +144,7 @@ public class MainForm extends AbstractPage {
         
         controldata.clearParameters();
         controldata.addParameter("mode", "show");
-        controldata.addParameter("view.type", Const.DETAILED);
+        controldata.addParameter("view.type", Const.SINGLE);
         controldata.addParameter("model.name", model);
         controldata.redirect(null, "select");
     }
