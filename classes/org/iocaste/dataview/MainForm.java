@@ -74,7 +74,7 @@ public class MainForm extends AbstractPage {
         InputComponent input;
         DocumentModelItem modelitem;
         Method method;
-        String modelname = (String)vdata.getParameter("modelname");
+        String modelname = (String)vdata.getParameter("model.name");
         Documents documents = new Documents(this);
         DocumentModel model = documents.getModel(modelname);
         Table table = ((Table)vdata.getElement(modelname));
