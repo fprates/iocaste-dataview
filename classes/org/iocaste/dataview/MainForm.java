@@ -71,9 +71,11 @@ public class MainForm extends AbstractPage {
     public final void save(ControlData cdata, ViewData vdata) throws Exception {
         TableItem tableitem;
         Object reg;
+        String value;
         InputComponent input;
         DocumentModelItem modelitem;
         Method method;
+        boolean modifyok;
         String modelname = (String)vdata.getParameter("model.name");
         Documents documents = new Documents(this);
         DocumentModel model = documents.getModel(modelname);
@@ -85,18 +87,29 @@ public class MainForm extends AbstractPage {
             
             tableitem = (TableItem)element;
             reg = Class.forName(model.getClassName()).newInstance();
+            modifyok = false;
+            
             for (Element column : tableitem.getElements()) {
                 if (!column.isDataStorable())
                     continue;
                 
                 input = (InputComponent)column;
                 modelitem = input.getModelItem();
+                
+                value = input.getValue();
+                if (value == null && model.isKey(modelitem)) {
+                	modifyok = false;
+                	break;
+                }
+                
                 method = reg.getClass().getMethod(modelitem.getSetterName(),
                         modelitem.getDataElement().getClassType());
                 method.invoke(reg, input.getParsedValue());
+                modifyok = true;
             }
             
-            documents.modify(model, reg);
+            if (modifyok)
+            	documents.modify(model, reg);
         }
     }
     
