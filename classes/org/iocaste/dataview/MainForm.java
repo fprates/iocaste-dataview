@@ -76,6 +76,7 @@ public class MainForm extends AbstractPage {
         DocumentModelItem modelitem;
         Method method;
         boolean modifyok;
+        Element cell;
         String modelname = (String)vdata.getParameter("model.name");
         Documents documents = new Documents(this);
         DocumentModel model = documents.getModel(modelname);
@@ -89,11 +90,13 @@ public class MainForm extends AbstractPage {
             reg = Class.forName(model.getClassName()).newInstance();
             modifyok = false;
             
-            for (Element column : tableitem.getElements()) {
-                if (!column.isDataStorable())
+            for (String name : tableitem.getElementNames()) {
+                cell = table.getElement(name);
+                
+                if (!cell.isDataStorable())
                     continue;
                 
-                input = (InputComponent)column;
+                input = (InputComponent)cell;
                 modelitem = input.getModelItem();
                 
                 value = input.getValue();
@@ -160,8 +163,9 @@ public class MainForm extends AbstractPage {
                 dataitem = (DataItem)element;
                 dataitem.setModelItem(modelitem);
                 
-                tfield = Shell.createInputItem(dataitem, sb.append(name).append(".").
-                        append(element.getName()).toString());
+                tfield = Shell.createInputItem(table, dataitem,
+                        sb.append(name).append(".").append(element.getName()).
+                        toString());
                 tfield.setEnabled(!model.isKey(modelitem));
                 
                 tableitem.add(tfield);
