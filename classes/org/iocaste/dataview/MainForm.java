@@ -39,6 +39,7 @@ public class MainForm extends AbstractPage {
         controldata.addParameter("view.type", Const.SINGLE);
         controldata.addParameter("model.name", modelname);
         controldata.addParameter("model.regs", documents.select(query, null));
+        controldata.setReloadableView(true);
         controldata.redirect(null, "select");
     }
     
@@ -192,6 +193,7 @@ public class MainForm extends AbstractPage {
         controldata.addParameter("mode", "show");
         controldata.addParameter("view.type", Const.SINGLE);
         controldata.addParameter("model.name", model);
+        controldata.setReloadableView(true);
         controldata.redirect(null, "select");
     }
 }
