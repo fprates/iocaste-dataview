@@ -47,6 +47,27 @@ public class MainForm extends AbstractPage {
         
     }
     
+    public final void insert(ControlData cdata, ViewData vdata) {
+        TableItem tableitem;
+        Table table = (Table)vdata.getElement(
+                (String)vdata.getParameter("model.name"));
+        
+        for (Element element : table.getElements()) {
+            if (element.getType() != Const.TABLE_ITEM)
+                continue;
+            
+            tableitem = (TableItem)element;
+            for (String name : tableitem.getElementNames()) {
+                element = table.getElement(name);
+                
+                if (!element.isDataStorable())
+                    continue;
+                
+                element.setEnabled(true);
+            }
+        }
+    }
+    
     public final void lastpage(ControlData cdata, ViewData vdata) {
         
     }
@@ -177,6 +198,7 @@ public class MainForm extends AbstractPage {
         }
         
         new Button(container, "save").setSubmit(true);
+        new Button(container, "insert").setSubmit(true);
         new Button(container, "firstpage").setSubmit(true);
         new Button(container, "earlierpage").setSubmit(true);
         new Button(container, "laterpage").setSubmit(true);
