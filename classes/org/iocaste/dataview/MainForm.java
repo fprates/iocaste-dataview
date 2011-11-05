@@ -47,25 +47,25 @@ public class MainForm extends AbstractPage {
         
     }
     
-    public final void insert(ControlData cdata, ViewData vdata) {
-        TableItem tableitem;
-        Table table = (Table)vdata.getElement(
+    public final void form(ViewData vdata) throws Exception {
+        DataForm form = new DataForm(null, "model.form");
+        Documents documents = new Documents(this);
+        DocumentModel model = documents.getModel(
                 (String)vdata.getParameter("model.name"));
         
-        for (Element element : table.getElements()) {
-            if (element.getType() != Const.TABLE_ITEM)
-                continue;
-            
-            tableitem = (TableItem)element;
-            for (String name : tableitem.getElementNames()) {
-                element = table.getElement(name);
-                
-                if (!element.isDataStorable())
-                    continue;
-                
-                element.setEnabled(true);
-            }
-        }
+        form.importModel(model);
+        form.addAction("insert.cancel");
+        form.addAction("insert.ok");
+        form.addAction("insert.next");
+        
+        vdata.addContainer(form);
+    }
+    
+    public final void insert(ControlData cdata, ViewData vdata) {
+        cdata.clearParameters();
+        cdata.addParameter("model.name", vdata.getParameter("model.name"));
+        cdata.setReloadableView(true);
+        cdata.redirect(null, "form");
     }
     
     public final void lastpage(ControlData cdata, ViewData vdata) {
@@ -158,6 +158,7 @@ public class MainForm extends AbstractPage {
         
         table.setMark(true);
         table.importModel(model);
+        
         elements = table.getElements();
         
         for (Element element_ : elements) {
@@ -170,10 +171,10 @@ public class MainForm extends AbstractPage {
                 table.setVisibleColumn(i, false);
         }
         
-        for (int k = 0; k < 20; k++) {
-            sb = new StringBuilder(table.getName()).append(".").append(k);
-            name = sb.toString();
-            tableitem = new TableItem(table, name);
+        for (int k = table.getFirstItem(); k < table.getMaxPageLines(); k++) {
+            tableitem = new TableItem(table);
+            name = tableitem.getName();
+            sb = new StringBuilder();
             
             i = 0;
             for (DocumentModelItem modelitem : model.getItens()) {
