@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import org.iocaste.documents.common.DocumentModel;
 import org.iocaste.documents.common.DocumentModelItem;
 import org.iocaste.documents.common.Documents;
+import org.iocaste.documents.common.ExtendedObject;
 import org.iocaste.shell.common.AbstractPage;
 import org.iocaste.shell.common.Button;
 import org.iocaste.shell.common.Const;
@@ -149,7 +150,8 @@ public class MainForm extends AbstractPage {
         Element[] elements;
         boolean key;
         int i = 0;
-        Object[] itens = (Object[])view.getParameter("model.regs");
+        ExtendedObject[] itens =
+        		(ExtendedObject[])view.getParameter("model.regs");
         Documents documents = new Documents(this);
         DocumentModel model = documents.getModel(
                 (String)view.getParameter("model.name"));
@@ -194,7 +196,7 @@ public class MainForm extends AbstractPage {
                 tableitem.add(tfield);
                 
                 if (k < itens.length)
-                    Shell.moveItemToInput((InputComponent)tfield, itens[k]);
+                    Shell.moveExtendedToInput((InputComponent)tfield, itens[k]);
             }
         }
         
