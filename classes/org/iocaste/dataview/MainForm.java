@@ -21,17 +21,27 @@ import org.iocaste.shell.common.ViewData;
 
 public class MainForm extends AbstractPage {
     
+    /**
+     * 
+     * @param cdata
+     * @param vdata
+     */
     public final void earlierpage(ControlData cdata, ViewData vdata) {
         
     }
     
+    /**
+     * 
+     * @param controldata
+     * @param view
+     * @throws Exception
+     */
     public final void edit(ControlData controldata, ViewData view) 
             throws Exception {
         String modelname = ((InputComponent)view.getElement("model.name")).
                 getValue();
         Documents documents = new Documents(this);
-        String query = new StringBuilder("select * from ").
-                append(modelname).toString();
+        String query = new StringBuilder("from ").append(modelname).toString();
         
         controldata.clearParameters();
         controldata.addParameter("mode", "edit");
@@ -42,12 +52,23 @@ public class MainForm extends AbstractPage {
         controldata.redirect(null, "select");
     }
     
+    /**
+     * 
+     * @param cdata
+     * @param vdata
+     */
     public final void firstpage(ControlData cdata, ViewData vdata) {
         
     }
     
+    /**
+     * 
+     * @param vdata
+     * @throws Exception
+     */
     public final void form(ViewData vdata) throws Exception {
-        DataForm form = new DataForm(null, "model.form");
+        Container container = new Form(null, "form");
+        DataForm form = new DataForm(container, "model.form");
         Documents documents = new Documents(this);
         DocumentModel model = documents.getModel(
                 (String)vdata.getParameter("model.name"));
@@ -57,9 +78,14 @@ public class MainForm extends AbstractPage {
         form.addAction("insertitem");
         form.addAction("insertnext");
         
-        vdata.addContainer(form);
+        vdata.addContainer(container);
     }
     
+    /**
+     * 
+     * @param cdata
+     * @param vdata
+     */
     public final void insert(ControlData cdata, ViewData vdata) {
         cdata.clearParameters();
         cdata.addParameter("model.name", vdata.getParameter("model.name"));
@@ -67,31 +93,60 @@ public class MainForm extends AbstractPage {
         cdata.redirect(null, "form");
     }
     
+    /**
+     * 
+     * @param cdata
+     * @param vdata
+     */
     public final void insertcancel(ControlData cdata, ViewData vdata) {
         
     }
     
+    /**
+     * 
+     * @param cdata
+     * @param vdata
+     * @throws Exception
+     */
     public final void insertitem(ControlData cdata, ViewData vdata) 
             throws Exception {
         Documents documents = new Documents(this);
-        DataForm form = (DataForm)vdata.getElement(
-                (String)vdata.getParameter("model.name"));
+        DataForm form = (DataForm)vdata.getElement("model.form");
         
         documents.save(form.getObject());
     }
     
+    /**
+     * 
+     * @param cdata
+     * @param vdata
+     */
     public final void insertnext(ControlData cdata, ViewData vdata) {
         
     }
     
+    /**
+     * 
+     * @param cdata
+     * @param vdata
+     */
     public final void lastpage(ControlData cdata, ViewData vdata) {
         
     }
     
+    /**
+     * 
+     * @param cdata
+     * @param vdata
+     */
     public final void laterpage(ControlData cdata, ViewData vdata) {
         
     }
 
+    /**
+     * 
+     * @param view
+     */
     public void main(ViewData view) {
         Container container = new Form(null, "main");
         DataForm form = new DataForm(container, "model");
@@ -106,6 +161,12 @@ public class MainForm extends AbstractPage {
         view.addContainer(container);
     }
     
+    /**
+     * 
+     * @param cdata
+     * @param vdata
+     * @throws Exception
+     */
     public final void save(ControlData cdata, ViewData vdata) throws Exception {
         TableItem tableitem;
         String value;
@@ -149,6 +210,11 @@ public class MainForm extends AbstractPage {
         }
     }
     
+    /**
+     * 
+     * @param view
+     * @throws Exception
+     */
     public void select(ViewData view) throws Exception {
         Container container = new Form(null, "dataview.container");
         DataItem dataitem;
@@ -220,6 +286,11 @@ public class MainForm extends AbstractPage {
         view.addContainer(container);
     }
     
+    /**
+     * 
+     * @param controldata
+     * @param view
+     */
     public final void show(ControlData controldata, ViewData view) {
         String model = ((InputComponent)view.getElement("model.name")).
                 getValue();
