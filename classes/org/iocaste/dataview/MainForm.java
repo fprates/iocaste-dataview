@@ -1,7 +1,5 @@
 package org.iocaste.dataview;
 
-import java.lang.reflect.Method;
-
 import org.iocaste.documents.common.DocumentModel;
 import org.iocaste.documents.common.DocumentModelItem;
 import org.iocaste.documents.common.Documents;
@@ -55,9 +53,9 @@ public class MainForm extends AbstractPage {
                 (String)vdata.getParameter("model.name"));
         
         form.importModel(model);
-        form.addAction("insert.cancel");
-        form.addAction("insert.ok");
-        form.addAction("insert.next");
+        form.addAction("insertcancel");
+        form.addAction("insertitem");
+        form.addAction("insertnext");
         
         vdata.addContainer(form);
     }
@@ -67,6 +65,23 @@ public class MainForm extends AbstractPage {
         cdata.addParameter("model.name", vdata.getParameter("model.name"));
         cdata.setReloadableView(true);
         cdata.redirect(null, "form");
+    }
+    
+    public final void insertcancel(ControlData cdata, ViewData vdata) {
+        
+    }
+    
+    public final void insertitem(ControlData cdata, ViewData vdata) 
+            throws Exception {
+        Documents documents = new Documents(this);
+        DataForm form = (DataForm)vdata.getElement(
+                (String)vdata.getParameter("model.name"));
+        
+        documents.save(form.getObject());
+    }
+    
+    public final void insertnext(ControlData cdata, ViewData vdata) {
+        
     }
     
     public final void lastpage(ControlData cdata, ViewData vdata) {
@@ -93,13 +108,11 @@ public class MainForm extends AbstractPage {
     
     public final void save(ControlData cdata, ViewData vdata) throws Exception {
         TableItem tableitem;
-        Object reg;
         String value;
         InputComponent input;
         DocumentModelItem modelitem;
-        Method method;
-        boolean modifyok;
         Element cell;
+        ExtendedObject object;
         String modelname = (String)vdata.getParameter("model.name");
         Documents documents = new Documents(this);
         DocumentModel model = documents.getModel(modelname);
@@ -110,8 +123,7 @@ public class MainForm extends AbstractPage {
                 continue;
             
             tableitem = (TableItem)element;
-            reg = Class.forName(model.getClassName()).newInstance();
-            modifyok = false;
+            object = null;
             
             for (String name : tableitem.getElementNames()) {
                 cell = table.getElement(name);
@@ -123,19 +135,17 @@ public class MainForm extends AbstractPage {
                 modelitem = input.getModelItem();
                 
                 value = input.getValue();
-                if (value == null && model.isKey(modelitem)) {
-                	modifyok = false;
+                if (value == null && model.isKey(modelitem))
                 	break;
-                }
                 
-                method = reg.getClass().getMethod(modelitem.getSetterName(),
-                        modelitem.getDataElement().getClassType());
-                method.invoke(reg, input.getParsedValue());
-                modifyok = true;
+                if (object == null)
+                    object = new ExtendedObject(model);
+                
+                object.setValue(modelitem, input.getParsedValue());
             }
             
-            if (modifyok)
-            	documents.modify(model, reg);
+            if (object != null)
+            	documents.modify(object);
         }
     }
     
