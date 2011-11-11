@@ -99,7 +99,7 @@ public class MainForm extends AbstractPage {
      * @param vdata
      */
     public final void insertcancel(ControlData cdata, ViewData vdata) {
-        
+        cdata.redirect(null, "select");
     }
     
     /**
@@ -113,7 +113,13 @@ public class MainForm extends AbstractPage {
         Documents documents = new Documents(this);
         DataForm form = (DataForm)vdata.getElement("model.form");
         
-        documents.save(form.getObject());
+        if (documents.save(form.getObject()) == 0) {
+        	cdata.message(Const.ERROR, "duplicated.entry");
+        	return;
+        }
+        
+        cdata.message(Const.STATUS, "insert.sucessful");
+        cdata.redirect(null, "select");
     }
     
     /**
