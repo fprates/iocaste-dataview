@@ -128,7 +128,18 @@ public class MainForm extends AbstractPage {
      * @param cdata
      * @param vdata
      */
-    public final void insertnext(ControlData cdata, ViewData vdata) {
+    public final void insertnext(ControlData cdata, ViewData vdata) 
+            throws Exception {
+        Documents documents = new Documents(this);
+        DataForm form = (DataForm)vdata.getElement("model.form");
+        
+        if (documents.save(form.getObject()) == 0) {
+            cdata.message(Const.ERROR, "duplicated.entry");
+            return;
+        }
+        
+        form.clearInputs();
+        cdata.message(Const.STATUS, "insert.sucessful");
         
     }
     
