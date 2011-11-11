@@ -74,6 +74,7 @@ public class MainForm extends AbstractPage {
                 (String)vdata.getParameter("model.name"));
         
         form.importModel(model);
+        form.setKeyRequired(true);
         form.addAction("insertcancel");
         form.addAction("insertitem");
         form.addAction("insertnext");
