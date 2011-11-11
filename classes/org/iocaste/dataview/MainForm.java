@@ -75,7 +75,7 @@ public class MainForm extends AbstractPage {
         
         form.importModel(model);
         form.setKeyRequired(true);
-        form.addAction("insertcancel");
+        form.addExitAction("insertcancel");
         form.addAction("insertitem");
         form.addAction("insertnext");
         
