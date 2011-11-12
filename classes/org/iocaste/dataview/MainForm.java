@@ -20,6 +20,38 @@ import org.iocaste.shell.common.TableItem;
 import org.iocaste.shell.common.ViewData;
 
 public class MainForm extends AbstractPage {
+    private Documents documents;
+    
+    /**
+     * 
+     * @param cdata
+     * @param vdata
+     * @throws Exception 
+     */
+    public final void delete(ControlData cdata, ViewData vdata) 
+            throws Exception {
+        TableItem item;
+        Table table = (Table)vdata.getElement("selection_view");
+        Documents documents = getDocuments();
+        
+        for (Element element : table.getElements()) {
+            if (element.getType() != Const.TABLE_ITEM)
+                continue;
+            
+            item = (TableItem)element;
+            if (!item.isSelected())
+                continue;
+            
+            if (documents.delete(item.getObject()) == 0) {
+                cdata.message(Const.ERROR, "error.on.delete");
+                return;
+            }
+
+            documents.commit();
+            cdata.message(Const.STATUS, "delete.sucessful");
+            table.remove(item);
+        }
+    }
     
     /**
      * 
@@ -40,8 +72,8 @@ public class MainForm extends AbstractPage {
             throws Exception {
         String modelname = ((InputComponent)view.getElement("model.name")).
                 getValue();
-        Documents documents = new Documents(this);
         String query = new StringBuilder("from ").append(modelname).toString();
+        Documents documents = getDocuments();
         
         controldata.clearParameters();
         controldata.addParameter("mode", "edit");
@@ -69,7 +101,7 @@ public class MainForm extends AbstractPage {
     public final void form(ViewData vdata) throws Exception {
         Container container = new Form(null, "form");
         DataForm form = new DataForm(container, "model.form");
-        Documents documents = new Documents(this);
+        Documents documents = getDocuments();
         DocumentModel model = documents.getModel(
                 (String)vdata.getParameter("model.name"));
         
@@ -80,6 +112,15 @@ public class MainForm extends AbstractPage {
         form.addAction("insertnext");
         
         vdata.addContainer(container);
+    }
+    
+    private final Documents getDocuments() {
+        if (documents != null)
+            return documents;
+        
+        documents = new Documents(this);
+        
+        return documents;
     }
     
     /**
@@ -111,8 +152,8 @@ public class MainForm extends AbstractPage {
      */
     public final void insertitem(ControlData cdata, ViewData vdata) 
             throws Exception {
-        Documents documents = new Documents(this);
         DataForm form = (DataForm)vdata.getElement("model.form");
+        Documents documents = getDocuments();
         
         if (documents.save(form.getObject()) == 0) {
         	cdata.message(Const.ERROR, "duplicated.entry");
@@ -130,8 +171,8 @@ public class MainForm extends AbstractPage {
      */
     public final void insertnext(ControlData cdata, ViewData vdata) 
             throws Exception {
-        Documents documents = new Documents(this);
         DataForm form = (DataForm)vdata.getElement("model.form");
+        Documents documents = getDocuments();
         
         if (documents.save(form.getObject()) == 0) {
             cdata.message(Const.ERROR, "duplicated.entry");
@@ -193,9 +234,9 @@ public class MainForm extends AbstractPage {
         Element cell;
         ExtendedObject object;
         String modelname = (String)vdata.getParameter("model.name");
-        Documents documents = new Documents(this);
+        Documents documents = getDocuments();
         DocumentModel model = documents.getModel(modelname);
-        Table table = ((Table)vdata.getElement(modelname));
+        Table table = ((Table)vdata.getElement("selection_view"));
         
         for (Element element : table.getElements()) {
             if (element.getType() != Const.TABLE_ITEM)
@@ -223,8 +264,11 @@ public class MainForm extends AbstractPage {
                 object.setValue(modelitem, input.getParsedValue());
             }
             
-            if (object != null)
-            	documents.modify(object);
+            if (object == null)
+                continue;
+            
+            documents.modify(object);
+            documents.commit();
         }
     }
     
@@ -246,10 +290,10 @@ public class MainForm extends AbstractPage {
         int i = 0;
         ExtendedObject[] itens =
         		(ExtendedObject[])view.getParameter("model.regs");
-        Documents documents = new Documents(this);
+        Documents documents = getDocuments();
         DocumentModel model = documents.getModel(
                 (String)view.getParameter("model.name"));
-        Table table = new Table(container, 0, model.getName());
+        Table table = new Table(container, 0, "selection_view");
         Const viewtype = (Const)view.getParameter("view.type");
         
         table.setMark(true);
@@ -296,6 +340,7 @@ public class MainForm extends AbstractPage {
         
         new Button(container, "save").setSubmit(true);
         new Button(container, "insert").setSubmit(true);
+        new Button(container, "delete").setSubmit(true);
         new Button(container, "firstpage").setSubmit(true);
         new Button(container, "earlierpage").setSubmit(true);
         new Button(container, "laterpage").setSubmit(true);
