@@ -311,7 +311,7 @@ public class MainForm extends AbstractPage {
                 table.setVisibleColumn(i, false);
         }
         
-        for (int k = table.getFirstItem(); k < table.getMaxPageLines(); k++) {
+        for (int k = table.getFirstItem(); k < itens.length; k++) {
             tableitem = new TableItem(table);
             name = tableitem.getName();
             sb = new StringBuilder();
