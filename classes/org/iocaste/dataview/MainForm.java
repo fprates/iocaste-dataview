@@ -48,9 +48,10 @@ public class MainForm extends AbstractPage {
             }
 
             documents.commit();
-            cdata.message(Const.STATUS, "delete.sucessful");
             table.remove(item);
         }
+        
+        cdata.message(Const.STATUS, "delete.sucessful");
     }
     
     /**
@@ -131,7 +132,6 @@ public class MainForm extends AbstractPage {
     public final void insert(ControlData cdata, ViewData vdata) {
         cdata.clearParameters();
         cdata.addParameter("model.name", vdata.getParameter("model.name"));
-        cdata.addParameter("model.regs", vdata.getParameter("model.regs"));
         cdata.setReloadableView(true);
         cdata.redirect(null, "form");
     }
@@ -153,8 +153,8 @@ public class MainForm extends AbstractPage {
      */
     public final void insertitem(ControlData cdata, ViewData vdata) 
             throws Exception {
-        ExtendedObject[] objects;
-        ExtendedObject[] itens;
+        Table table;
+//        TableItem tableitem;
         DataForm form = (DataForm)vdata.getElement("model.form");
         ExtendedObject object = form.getObject();
         Documents documents = getDocuments();
@@ -164,15 +164,9 @@ public class MainForm extends AbstractPage {
         	return;
         }
         
-        itens = (ExtendedObject[])vdata.getParameter("model.regs");
-        objects = new ExtendedObject[itens.length+1];
-        System.arraycopy(itens, 0, objects, 0, itens.length);
-        objects[itens.length] = object;
+        table = (Table)getView("select").getElement("selection_view");
+        new TableItem(table);
         
-        cdata.clearParameters();
-        cdata.addParameter("model.name", vdata.getParameter("model.name"));
-        cdata.addParameter("model.regs", objects);
-        cdata.setReloadableView(true);
         cdata.message(Const.STATUS, "insert.sucessful");
         cdata.redirect(null, "select");
     }
