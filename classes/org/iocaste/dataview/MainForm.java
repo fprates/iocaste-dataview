@@ -22,6 +22,35 @@ import org.iocaste.shell.common.ViewData;
 public class MainForm extends AbstractPage {
     private Documents documents;
     
+    private final void addTableItem(Table table, Element[] elements,
+            ExtendedObject object) {
+        Element tfield;
+        Element element;
+        DataItem dataitem;
+        int i = 0;
+        TableItem tableitem = new TableItem(table);
+        DocumentModel model = table.getModel();
+        StringBuilder sb = new StringBuilder();
+        
+        for (DocumentModelItem modelitem : model.getItens()) {
+            element = elements[i++];
+            if (element.getType() != Const.DATA_ITEM)
+                continue;
+            
+            dataitem = (DataItem)element;
+            dataitem.setModelItem(modelitem);
+            tfield = Shell.createInputItem(table, dataitem,
+                    sb.append(tableitem.getName()).append(".").
+                    append(dataitem.getName()).toString());
+            
+            tfield.setEnabled(!model.isKey(modelitem));
+            
+            tableitem.add(tfield);
+        }
+        
+        tableitem.setObject(object);
+    }
+    
     /**
      * 
      * @param cdata
@@ -145,6 +174,25 @@ public class MainForm extends AbstractPage {
         cdata.redirect(null, "select");
     }
     
+    private final void insertcommon(ControlData cdata, ViewData vdata)
+            throws Exception {
+        Table table;
+        ViewData selectview;
+        DataForm form = (DataForm)vdata.getElement("model.form");
+        ExtendedObject object = form.getObject();
+        Documents documents = getDocuments();
+        
+        if (documents.save(object) == 0) {
+            cdata.message(Const.ERROR, "duplicated.entry");
+            return;
+        }
+        
+        selectview = getView("select");
+        table = (Table)selectview.getElement("selection_view");
+        addTableItem(table, table.getElements(), object);
+        updateView(selectview);
+    }
+    
     /**
      * 
      * @param cdata
@@ -153,20 +201,7 @@ public class MainForm extends AbstractPage {
      */
     public final void insertitem(ControlData cdata, ViewData vdata) 
             throws Exception {
-        Table table;
-//        TableItem tableitem;
-        DataForm form = (DataForm)vdata.getElement("model.form");
-        ExtendedObject object = form.getObject();
-        Documents documents = getDocuments();
-        
-        if (documents.save(object) == 0) {
-        	cdata.message(Const.ERROR, "duplicated.entry");
-        	return;
-        }
-        
-        table = (Table)getView("select").getElement("selection_view");
-        new TableItem(table);
-        
+        insertcommon(cdata, vdata);
         cdata.message(Const.STATUS, "insert.sucessful");
         cdata.redirect(null, "select");
     }
@@ -179,13 +214,8 @@ public class MainForm extends AbstractPage {
     public final void insertnext(ControlData cdata, ViewData vdata) 
             throws Exception {
         DataForm form = (DataForm)vdata.getElement("model.form");
-        Documents documents = getDocuments();
         
-        if (documents.save(form.getObject()) == 0) {
-            cdata.message(Const.ERROR, "duplicated.entry");
-            return;
-        }
-        
+        insertcommon(cdata, vdata);
         form.clearInputs();
         cdata.message(Const.STATUS, "insert.sucessful");
         
@@ -285,15 +315,9 @@ public class MainForm extends AbstractPage {
      * @throws Exception
      */
     public void select(ViewData view) throws Exception {
-        Container container = new Form(null, "dataview.container");
-        DataItem dataitem;
-        TableItem tableitem;
-        String name;
-        StringBuilder sb;
-        Element tfield;
-        Element element;
         Element[] elements;
         boolean key;
+        Container container = new Form(null, "dataview.container");
         int i = 0;
         ExtendedObject[] itens =
         		(ExtendedObject[])view.getParameter("model.regs");
@@ -318,32 +342,8 @@ public class MainForm extends AbstractPage {
                 table.setVisibleColumn(i, false);
         }
         
-        for (int k = table.getFirstItem(); k < itens.length; k++) {
-            tableitem = new TableItem(table);
-            name = tableitem.getName();
-            sb = new StringBuilder();
-            
-            i = 0;
-            for (DocumentModelItem modelitem : model.getItens()) {
-                element = elements[i++];
-                if (element.getType() != Const.DATA_ITEM)
-                    continue;
-                
-                sb.setLength(0);
-                dataitem = (DataItem)element;
-                dataitem.setModelItem(modelitem);
-                
-                tfield = Shell.createInputItem(table, dataitem,
-                        sb.append(name).append(".").append(element.getName()).
-                        toString());
-                tfield.setEnabled(!model.isKey(modelitem));
-                
-                tableitem.add(tfield);
-                
-                if (k < itens.length)
-                    Shell.moveExtendedToInput((InputComponent)tfield, itens[k]);
-            }
-        }
+        for (int k = table.getFirstItem(); k < itens.length; k++)
+            addTableItem(table, elements, itens[k]);
         
         new Button(container, "save").setSubmit(true);
         new Button(container, "insert").setSubmit(true);
