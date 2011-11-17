@@ -39,6 +39,8 @@ public class MainForm extends AbstractPage {
             
             dataitem = (DataItem)element;
             dataitem.setModelItem(modelitem);
+            
+            sb.setLength(0);
             tfield = Shell.createInputItem(table, dataitem,
                     sb.append(tableitem.getName()).append(".").
                     append(dataitem.getName()).toString());
