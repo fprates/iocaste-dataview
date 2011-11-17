@@ -139,10 +139,10 @@ public class MainForm extends AbstractPage {
         
         form.importModel(model);
         form.setKeyRequired(true);
-        form.addExitAction("insertcancel");
         form.addAction("insertitem");
         form.addAction("insertnext");
         
+        vdata.setNavbarActionEnabled("back", true);
         vdata.addContainer(container);
     }
     
@@ -256,6 +256,7 @@ public class MainForm extends AbstractPage {
         
         view.setFocus("model.name");
         view.setTitle("dataview.selection");
+        view.setNavbarActionEnabled("back", true);
         view.addContainer(container);
     }
     
@@ -355,6 +356,7 @@ public class MainForm extends AbstractPage {
         new Button(container, "laterpage").setSubmit(true);
         new Button(container, "lastpage").setSubmit(true);
         
+        view.setNavbarActionEnabled("back", true);
         view.addContainer(container);
     }
     
