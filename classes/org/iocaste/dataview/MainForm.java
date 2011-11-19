@@ -100,20 +100,27 @@ public class MainForm extends AbstractPage {
      * @param view
      * @throws Exception
      */
-    public final void edit(ControlData controldata, ViewData view) 
+    public final void edit(ControlData cdata, ViewData vdata) 
             throws Exception {
-        String modelname = ((InputComponent)view.getElement("model.name")).
+        String query;
+        String modelname = ((InputComponent)vdata.getElement("model.name")).
                 getValue();
-        String query = new StringBuilder("from ").append(modelname).toString();
         Documents documents = getDocuments();
         
-        controldata.clearParameters();
-        controldata.addParameter("mode", "edit");
-        controldata.addParameter("view.type", Const.SINGLE);
-        controldata.addParameter("model.name", modelname);
-        controldata.addParameter("model.regs", documents.select(query, null));
-        controldata.setReloadableView(true);
-        controldata.redirect(null, "select");
+        if (!documents.hasModel(modelname)) {
+            cdata.message(Const.ERROR, "invalid.model");
+            return;
+        }
+            
+        query = new StringBuilder("from ").append(modelname).toString();
+        
+        cdata.clearParameters();
+        cdata.addParameter("mode", "edit");
+        cdata.addParameter("view.type", Const.SINGLE);
+        cdata.addParameter("model.name", modelname);
+        cdata.addParameter("model.regs", documents.select(query, null));
+        cdata.setReloadableView(true);
+        cdata.redirect(null, "select");
     }
     
     /**
@@ -252,7 +259,7 @@ public class MainForm extends AbstractPage {
         
         formitem.setObligatory(true);
         form.addAction("edit");
-        form.addAction("show");
+//        form.addAction("show");
         
         view.setFocus("model.name");
         view.setTitle("dataview.selection");
@@ -351,10 +358,10 @@ public class MainForm extends AbstractPage {
         new Button(container, "save").setSubmit(true);
         new Button(container, "insert").setSubmit(true);
         new Button(container, "delete").setSubmit(true);
-        new Button(container, "firstpage").setSubmit(true);
-        new Button(container, "earlierpage").setSubmit(true);
-        new Button(container, "laterpage").setSubmit(true);
-        new Button(container, "lastpage").setSubmit(true);
+//        new Button(container, "firstpage").setSubmit(true);
+//        new Button(container, "earlierpage").setSubmit(true);
+//        new Button(container, "laterpage").setSubmit(true);
+//        new Button(container, "lastpage").setSubmit(true);
         
         view.setNavbarActionEnabled("back", true);
         view.addContainer(container);
