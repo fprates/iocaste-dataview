@@ -58,9 +58,13 @@
             <classes dir="${builddir}/classes"/>
         </war>
 
-        <undeploy url="${url}/manager" username="${username}" password="${password}"
+        <condition property="manager_url" value="${url}/manager/text" else="${url}/manager">
+            <equals arg1="${tomcat_version}" arg2="7"/>
+        </condition>
+
+        <undeploy url="${manager_url}" username="${username}" password="${password}"
             path="/iocaste-${ant.project.name}" failonerror="false"/>
-        <deploy url="${url}/manager" username="${username}" password="${password}"
+        <deploy url="${manager_url}" username="${username}" password="${password}"
             path="/iocaste-${ant.project.name}" war="file:${warfilename}"
             failonerror="false"/>
 
