@@ -57,22 +57,14 @@ public class MainForm extends AbstractPage {
      * 
      * @param cdata
      * @param vdata
-     * @throws Exception 
+     * @throws Exception
      */
     public final void delete(ControlData cdata, ViewData vdata) 
             throws Exception {
-        TableItem item;
         Table table = (Table)vdata.getElement("selection_view");
         Documents documents = getDocuments();
         
-        for (Element element : table.getElements()) {
-            if (element.getType() != Const.TABLE_ITEM)
-                continue;
-            
-            item = (TableItem)element;
-            if (!item.isSelected())
-                continue;
-            
+        for (TableItem item : table.getSelected()) {
             if (documents.delete(item.getObject()) == 0) {
                 cdata.message(Const.ERROR, "error.on.delete");
                 return;
