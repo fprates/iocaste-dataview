@@ -14,7 +14,6 @@ import org.iocaste.shell.common.DataItem;
 import org.iocaste.shell.common.Element;
 import org.iocaste.shell.common.Form;
 import org.iocaste.shell.common.InputComponent;
-import org.iocaste.shell.common.Shell;
 import org.iocaste.shell.common.Table;
 import org.iocaste.shell.common.TableItem;
 import org.iocaste.shell.common.ViewData;
@@ -25,29 +24,15 @@ public class Main extends AbstractPage {
     private final void addTableItem(Table table, Element[] elements,
             ExtendedObject object) {
         Element tfield;
-        Element element;
-        DataItem dataitem;
-        int i = 0;
+        String name;
         TableItem tableitem = new TableItem(table);
         DocumentModel model = table.getModel();
-        StringBuilder sb = new StringBuilder();
         
         for (DocumentModelItem modelitem : model.getItens()) {
-            element = elements[i++];
-            if (element.getType() != Const.DATA_ITEM)
-                continue;
-            
-            dataitem = (DataItem)element;
-            dataitem.setModelItem(modelitem);
-            
-            sb.setLength(0);
-            tfield = Shell.createInputItem(table, dataitem,
-                    sb.append(tableitem.getName()).append(".").
-                    append(dataitem.getName()).toString());
-            
+            name = modelitem.getName();
+            tableitem.add(Const.TEXT_FIELD, name, null);
+            tfield = table.getElement(tableitem.getComplexName(name));
             tfield.setEnabled(!model.isKey(modelitem));
-            
-            tableitem.add(tfield);
         }
         
         tableitem.setObject(object);
