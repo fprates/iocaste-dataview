@@ -19,7 +19,7 @@ import org.iocaste.shell.common.Table;
 import org.iocaste.shell.common.TableItem;
 import org.iocaste.shell.common.ViewData;
 
-public class MainForm extends AbstractPage {
+public class Main extends AbstractPage {
     private Documents documents;
     
     private final void addTableItem(Table table, Element[] elements,

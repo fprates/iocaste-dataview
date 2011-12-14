@@ -21,7 +21,7 @@
         <servlet-class>org.iocaste.shell.common.IocasteServlet</servlet-class>
         <init-param>
             <param-name>form</param-name>
-            <param-value>org.iocaste.dataview.MainForm</param-value>
+            <param-value>org.iocaste.dataview.Main</param-value>
         </init-param>
     </servlet>
     
