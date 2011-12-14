@@ -94,9 +94,9 @@ public class MainForm extends AbstractPage {
      */
     public final void edit(ControlData cdata, ViewData vdata) 
             throws Exception {
-        String query;
-        String modelname = ((InputComponent)vdata.getElement("model.name")).
-                getValue();
+        ExtendedObject[] itens;
+        String query, modelname = ((InputComponent)vdata.
+                getElement("model.name")).getValue();
         Documents documents = getDocuments();
         
         if (!documents.hasModel(modelname)) {
@@ -105,12 +105,16 @@ public class MainForm extends AbstractPage {
         }
             
         query = new StringBuilder("from ").append(modelname).toString();
+        itens = documents.select(query, null);
+        
+        if (itens == null)
+            cdata.message(Const.WARNING, "table.is.empty");
         
         cdata.clearParameters();
         cdata.addParameter("mode", "edit");
         cdata.addParameter("view.type", Const.SINGLE);
         cdata.addParameter("model.name", modelname);
-        cdata.addParameter("model.regs", documents.select(query, null));
+        cdata.addParameter("model.regs", itens);
         cdata.setReloadableView(true);
         cdata.redirect(null, "select");
     }
@@ -344,8 +348,9 @@ public class MainForm extends AbstractPage {
                 table.setVisibleColumn(i, false);
         }
         
-        for (int k = table.getFirstItem(); k < itens.length; k++)
-            addTableItem(table, elements, itens[k]);
+        if (itens != null)
+            for (int k = table.getFirstItem(); k < itens.length; k++)
+                addTableItem(table, elements, itens[k]);
         
         new Button(container, "save").setSubmit(true);
         new Button(container, "insert").setSubmit(true);
