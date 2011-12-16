@@ -161,9 +161,11 @@ public class Main extends AbstractPage {
      * 
      * @param cdata
      * @param vdata
+     * @throws Exception 
      */
-    public final void insertcancel(ControlData cdata, ViewData vdata) {
-        cdata.redirect(null, "select");
+    public final void insertcancel(ControlData cdata, ViewData vdata)
+            throws Exception {
+        back(cdata, vdata);
     }
     
     private final void insertcommon(ControlData cdata, ViewData vdata)
@@ -194,8 +196,8 @@ public class Main extends AbstractPage {
     public final void insertitem(ControlData cdata, ViewData vdata) 
             throws Exception {
         insertcommon(cdata, vdata);
-        cdata.message(Const.STATUS, "insert.sucessful");
-        cdata.redirect(null, "select");
+        cdata.message(Const.STATUS, "insert.successful");
+        back(cdata, vdata);
     }
     
     /**
@@ -209,8 +211,7 @@ public class Main extends AbstractPage {
         
         insertcommon(cdata, vdata);
         form.clearInputs();
-        cdata.message(Const.STATUS, "insert.sucessful");
-        
+        cdata.message(Const.STATUS, "insert.successful");
     }
     
     /**
