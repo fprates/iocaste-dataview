@@ -1,5 +1,7 @@
 package org.iocaste.dataview;
 
+import org.iocaste.documents.common.DataElement;
+import org.iocaste.documents.common.DataType;
 import org.iocaste.documents.common.DocumentModel;
 import org.iocaste.documents.common.DocumentModelItem;
 import org.iocaste.documents.common.Documents;
@@ -237,7 +239,13 @@ public class Main extends AbstractPage {
         Container container = new Form(null, "main");
         DataForm form = new DataForm(container, "model");
         DataItem formitem = new DataItem(form, Const.TEXT_FIELD, "model.name");
+        DataElement dataelement = new DataElement();
         
+        dataelement.setLength(20);
+        dataelement.setType(DataType.CHAR);
+        dataelement.setUpcase(true);
+        
+        formitem.setDataElement(dataelement);
         formitem.setObligatory(true);
         form.addAction("edit");
 //        form.addAction("show");
