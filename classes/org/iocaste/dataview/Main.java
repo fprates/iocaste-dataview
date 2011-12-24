@@ -16,6 +16,7 @@ import org.iocaste.shell.common.DataItem;
 import org.iocaste.shell.common.Element;
 import org.iocaste.shell.common.Form;
 import org.iocaste.shell.common.InputComponent;
+import org.iocaste.shell.common.SearchHelp;
 import org.iocaste.shell.common.Table;
 import org.iocaste.shell.common.TableItem;
 import org.iocaste.shell.common.ViewData;
@@ -241,11 +242,17 @@ public class Main extends AbstractPage {
         DataForm form = new DataForm(container, "model");
         DataItem formitem = new DataItem(form, Const.TEXT_FIELD, "model.name");
         DataElement dataelement = new DataElement();
+        SearchHelp sh = new SearchHelp(container, "tablename.search");
         
         dataelement.setLength(20);
         dataelement.setType(DataType.CHAR);
         dataelement.setUpcase(true);
         
+        sh.setModelName("MODEL");
+        sh.addModelItemName("NAME");
+        sh.setExport("NAME");
+        
+        formitem.setSearchHelp(sh);
         formitem.setDataElement(dataelement);
         formitem.setObligatory(true);
         form.addAction("edit");
