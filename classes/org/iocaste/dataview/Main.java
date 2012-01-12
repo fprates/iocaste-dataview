@@ -10,7 +10,6 @@ import org.iocaste.shell.common.AbstractPage;
 import org.iocaste.shell.common.Button;
 import org.iocaste.shell.common.Const;
 import org.iocaste.shell.common.Container;
-import org.iocaste.shell.common.ControlData;
 import org.iocaste.shell.common.DataForm;
 import org.iocaste.shell.common.DataItem;
 import org.iocaste.shell.common.Element;
@@ -18,14 +17,14 @@ import org.iocaste.shell.common.Form;
 import org.iocaste.shell.common.InputComponent;
 import org.iocaste.shell.common.SearchHelp;
 import org.iocaste.shell.common.Table;
+import org.iocaste.shell.common.TableColumn;
 import org.iocaste.shell.common.TableItem;
 import org.iocaste.shell.common.ViewData;
 
 public class Main extends AbstractPage {
     private Documents documents;
     
-    private final void addTableItem(Table table, Element[] elements,
-            ExtendedObject object) {
+    private final void addTableItem(Table table, ExtendedObject object) {
         Element tfield;
         String name;
         TableItem tableitem = new TableItem(table);
@@ -43,18 +42,16 @@ public class Main extends AbstractPage {
     
     /**
      * 
-     * @param cdata
      * @param vdata
      * @throws Exception
      */
-    public final void delete(ControlData cdata, ViewData vdata) 
-            throws Exception {
+    public final void delete(ViewData vdata) throws Exception {
         Table table = (Table)vdata.getElement("selection_view");
         Documents documents = getDocuments();
         
         for (TableItem item : table.getSelected()) {
             if (documents.delete(item.getObject()) == 0) {
-                cdata.message(Const.ERROR, "error.on.delete");
+                vdata.message(Const.ERROR, "error.on.delete");
                 return;
             }
 
@@ -62,33 +59,30 @@ public class Main extends AbstractPage {
             table.remove(item);
         }
         
-        cdata.message(Const.STATUS, "delete.sucessful");
+        vdata.message(Const.STATUS, "delete.sucessful");
     }
     
     /**
      * 
-     * @param cdata
      * @param vdata
      */
-    public final void earlierpage(ControlData cdata, ViewData vdata) {
+    public final void earlierpage(ViewData vdata) {
         
     }
     
     /**
      * 
-     * @param controldata
-     * @param view
+     * @param vdata
      * @throws Exception
      */
-    public final void edit(ControlData cdata, ViewData vdata) 
-            throws Exception {
+    public final void edit(ViewData vdata) throws Exception {
         ExtendedObject[] itens;
         String query, modelname = ((InputComponent)vdata.
                 getElement("model.name")).getValue();
         Documents documents = getDocuments();
         
         if (!documents.hasModel(modelname)) {
-            cdata.message(Const.ERROR, "invalid.model");
+            vdata.message(Const.ERROR, "invalid.model");
             return;
         }
             
@@ -96,23 +90,22 @@ public class Main extends AbstractPage {
         itens = documents.select(query, null);
         
         if (itens == null)
-            cdata.message(Const.WARNING, "table.is.empty");
+            vdata.message(Const.WARNING, "table.is.empty");
         
-        cdata.clearParameters();
-        cdata.addParameter("mode", "edit");
-        cdata.addParameter("view.type", Const.SINGLE);
-        cdata.addParameter("model.name", modelname);
-        cdata.addParameter("model.regs", itens);
-        cdata.setReloadableView(true);
-        cdata.redirect(null, "select");
+        vdata.clearParameters();
+        vdata.addParameter("mode", "edit");
+        vdata.addParameter("view.type", Const.SINGLE);
+        vdata.addParameter("model.name", modelname);
+        vdata.addParameter("model.regs", itens);
+        vdata.setReloadableView(true);
+        vdata.redirect(null, "select");
     }
     
     /**
      * 
-     * @param cdata
      * @param vdata
      */
-    public final void firstpage(ControlData cdata, ViewData vdata) {
+    public final void firstpage(ViewData vdata) {
         
     }
     
@@ -148,29 +141,30 @@ public class Main extends AbstractPage {
     
     /**
      * 
-     * @param cdata
      * @param vdata
      */
-    public final void insert(ControlData cdata, ViewData vdata) {
-        cdata.clearParameters();
-        cdata.addParameter("model.name", vdata.getParameter("model.name"));
-        cdata.setReloadableView(true);
-        cdata.redirect(null, "form");
+    public final void insert(ViewData vdata) {
+        vdata.clearParameters();
+        vdata.addParameter("model.name", vdata.getParameter("model.name"));
+        vdata.setReloadableView(true);
+        vdata.redirect(null, "form");
     }
     
     /**
      * 
-     * @param cdata
      * @param vdata
      * @throws Exception 
      */
-    public final void insertcancel(ControlData cdata, ViewData vdata)
-            throws Exception {
-        back(cdata, vdata);
+    public final void insertcancel(ViewData vdata) throws Exception {
+        back(vdata);
     }
     
-    private final void insertcommon(ControlData cdata, ViewData vdata)
-            throws Exception {
+    /**
+     * 
+     * @param vdata
+     * @throws Exception
+     */
+    private final void insertcommon(ViewData vdata) throws Exception {
         Table table;
         ViewData selectview;
         DataForm form = (DataForm)vdata.getElement("model.form");
@@ -178,58 +172,52 @@ public class Main extends AbstractPage {
         Documents documents = getDocuments();
         
         if (documents.save(object) == 0) {
-            cdata.message(Const.ERROR, "duplicated.entry");
+            vdata.message(Const.ERROR, "duplicated.entry");
             return;
         }
         
         selectview = getView("select");
         table = (Table)selectview.getElement("selection_view");
-        addTableItem(table, table.getElements(), object);
+        addTableItem(table, object);
         updateView(selectview);
     }
     
     /**
      * 
-     * @param cdata
      * @param vdata
      * @throws Exception
      */
-    public final void insertitem(ControlData cdata, ViewData vdata) 
-            throws Exception {
-        insertcommon(cdata, vdata);
-        cdata.message(Const.STATUS, "insert.successful");
-        back(cdata, vdata);
+    public final void insertitem(ViewData vdata) throws Exception {
+        insertcommon(vdata);
+        vdata.message(Const.STATUS, "insert.successful");
+        back(vdata);
     }
     
     /**
      * 
-     * @param cdata
      * @param vdata
      */
-    public final void insertnext(ControlData cdata, ViewData vdata) 
-            throws Exception {
+    public final void insertnext(ViewData vdata) throws Exception {
         DataForm form = (DataForm)vdata.getElement("model.form");
         
-        insertcommon(cdata, vdata);
+        insertcommon(vdata);
         form.clearInputs();
-        cdata.message(Const.STATUS, "insert.successful");
+        vdata.message(Const.STATUS, "insert.successful");
     }
     
     /**
      * 
-     * @param cdata
      * @param vdata
      */
-    public final void lastpage(ControlData cdata, ViewData vdata) {
+    public final void lastpage(ViewData vdata) {
         
     }
     
     /**
      * 
-     * @param cdata
      * @param vdata
      */
-    public final void laterpage(ControlData cdata, ViewData vdata) {
+    public final void laterpage(ViewData vdata) {
         
     }
 
@@ -266,11 +254,10 @@ public class Main extends AbstractPage {
     
     /**
      * 
-     * @param cdata
      * @param vdata
      * @throws Exception
      */
-    public final void save(ControlData cdata, ViewData vdata) throws Exception {
+    public final void save(ViewData vdata) throws Exception {
         TableItem tableitem;
         String value;
         InputComponent input;
@@ -322,36 +309,28 @@ public class Main extends AbstractPage {
      * @throws Exception
      */
     public void select(ViewData view) throws Exception {
-        Element[] elements;
         boolean key;
         Container container = new Form(null, "dataview.container");
-        int i = 0;
         ExtendedObject[] itens =
         		(ExtendedObject[])view.getParameter("model.regs");
         Documents documents = getDocuments();
         DocumentModel model = documents.getModel(
                 (String)view.getParameter("model.name"));
-        Table table = new Table(container, 0, "selection_view");
+        Table table = new Table(container, "selection_view");
         Const viewtype = (Const)view.getParameter("view.type");
         
         table.setMark(true);
         table.importModel(model);
         
-        elements = table.getElements();
-        
-        for (Element element_ : elements) {
-            i++;
-            if (element_.getType() != Const.DATA_ITEM)
-                continue;
-            
-            key = model.isKey(((DataItem)element_).getModelItem());
+        for (TableColumn column: table.getColumns()) {
+            key = model.isKey(column.getModelItem());
             if (!key && (viewtype == Const.DETAILED))
-                table.setVisibleColumn(i, false);
+                column.setVisible(false);
         }
         
         if (itens != null)
-            for (int k = table.getFirstItem(); k < itens.length; k++)
-                addTableItem(table, elements, itens[k]);
+            for (ExtendedObject item : itens)
+                addTableItem(table, item);
         
         new Button(container, "save").setSubmit(true);
         new Button(container, "insert").setSubmit(true);
@@ -367,18 +346,17 @@ public class Main extends AbstractPage {
     
     /**
      * 
-     * @param controldata
-     * @param view
+     * @param vdata
      */
-    public final void show(ControlData controldata, ViewData view) {
-        String model = ((InputComponent)view.getElement("model.name")).
+    public final void show(ViewData vdata) {
+        String model = ((InputComponent)vdata.getElement("model.name")).
                 getValue();
         
-        controldata.clearParameters();
-        controldata.addParameter("mode", "show");
-        controldata.addParameter("view.type", Const.SINGLE);
-        controldata.addParameter("model.name", model);
-        controldata.setReloadableView(true);
-        controldata.redirect(null, "select");
+        vdata.clearParameters();
+        vdata.addParameter("mode", "show");
+        vdata.addParameter("view.type", Const.SINGLE);
+        vdata.addParameter("model.name", model);
+        vdata.setReloadableView(true);
+        vdata.redirect(null, "select");
     }
 }
