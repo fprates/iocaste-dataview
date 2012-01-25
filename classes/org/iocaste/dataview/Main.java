@@ -93,10 +93,10 @@ public class Main extends AbstractPage {
             vdata.message(Const.WARNING, "table.is.empty");
         
         vdata.clearParameters();
-        vdata.addParameter("mode", "edit");
-        vdata.addParameter("view.type", Const.SINGLE);
-        vdata.addParameter("model.name", modelname);
-        vdata.addParameter("model.regs", itens);
+        vdata.export("mode", "edit");
+        vdata.export("view.type", Const.SINGLE);
+        vdata.export("model.name", modelname);
+        vdata.export("model.regs", itens);
         vdata.setReloadableView(true);
         vdata.redirect(null, "select");
     }
@@ -144,8 +144,10 @@ public class Main extends AbstractPage {
      * @param vdata
      */
     public final void insert(ViewData vdata) {
+        String modelname = (String)vdata.getParameter("model.name");
+        
         vdata.clearParameters();
-        vdata.addParameter("model.name", vdata.getParameter("model.name"));
+        vdata.export("model.name", modelname);
         vdata.setReloadableView(true);
         vdata.redirect(null, "form");
     }
@@ -323,6 +325,9 @@ public class Main extends AbstractPage {
         table.importModel(model);
         
         for (TableColumn column: table.getColumns()) {
+            if (column.isMark())
+                continue;
+            
             key = model.isKey(column.getModelItem());
             if (!key && (viewtype == Const.DETAILED))
                 column.setVisible(false);
@@ -332,9 +337,9 @@ public class Main extends AbstractPage {
             for (ExtendedObject item : itens)
                 addTableItem(table, item);
         
-        new Button(container, "save").setSubmit(true);
-        new Button(container, "insert").setSubmit(true);
-        new Button(container, "delete").setSubmit(true);
+        new Button(container, "save");
+        new Button(container, "insert");
+        new Button(container, "delete");
 //        new Button(container, "firstpage").setSubmit(true);
 //        new Button(container, "earlierpage").setSubmit(true);
 //        new Button(container, "laterpage").setSubmit(true);
