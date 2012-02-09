@@ -19,6 +19,7 @@ import org.iocaste.shell.common.SearchHelp;
 import org.iocaste.shell.common.Table;
 import org.iocaste.shell.common.TableColumn;
 import org.iocaste.shell.common.TableItem;
+import org.iocaste.shell.common.TextField;
 import org.iocaste.shell.common.ViewData;
 
 public class Main extends AbstractPage {
@@ -32,9 +33,11 @@ public class Main extends AbstractPage {
         
         for (DocumentModelItem modelitem : model.getItens()) {
             name = modelitem.getName();
-            tableitem.add(Const.TEXT_FIELD, name, null);
-            tfield = table.getElement(tableitem.getComplexName(name));
+            
+            tfield = new TextField(table, name);
             tfield.setEnabled(!model.isKey(modelitem));
+            
+            tableitem.add(tfield);
         }
         
         tableitem.setObject(object);
@@ -49,7 +52,10 @@ public class Main extends AbstractPage {
         Table table = (Table)vdata.getElement("selection_view");
         Documents documents = getDocuments();
         
-        for (TableItem item : table.getSelected()) {
+        for (TableItem item : table.getItens()) {
+            if (!item.isSelected())
+                continue;
+            
             if (documents.delete(item.getObject()) == 0) {
                 vdata.message(Const.ERROR, "error.on.delete");
                 return;
@@ -77,20 +83,15 @@ public class Main extends AbstractPage {
      */
     public final void edit(ViewData vdata) throws Exception {
         ExtendedObject[] itens;
-        String query, modelname = ((InputComponent)vdata.
+        String modelname = ((InputComponent)vdata.
                 getElement("model.name")).getValue();
-        Documents documents = getDocuments();
         
-        if (!documents.hasModel(modelname)) {
-            vdata.message(Const.ERROR, "invalid.model");
+        try {
+            itens = getTableItens(modelname);
+        } catch (Exception e) {
+            vdata.message(Const.ERROR, e.getMessage());
             return;
         }
-            
-        query = new StringBuilder("from ").append(modelname).toString();
-        itens = documents.select(query, null);
-        
-        if (itens == null)
-            vdata.message(Const.WARNING, "table.is.empty");
         
         vdata.clearParameters();
         vdata.export("mode", "edit");
@@ -137,6 +138,29 @@ public class Main extends AbstractPage {
         documents = new Documents(this);
         
         return documents;
+    }
+    
+    /**
+     * 
+     * @param name
+     * @return
+     * @throws Exception
+     */
+    private final ExtendedObject[] getTableItens(String name) throws Exception {
+        ExtendedObject[] itens;
+        String query;
+        Documents documents = getDocuments();
+        
+        if (!documents.hasModel(name))
+            throw new Exception("invalid.model");
+            
+        query = new StringBuilder("from ").append(name).toString();
+        itens = documents.select(query, null);
+        
+        if (itens == null)
+            throw new Exception("table.is.empty");
+        
+        return itens;
     }
     
     /**
@@ -249,7 +273,7 @@ public class Main extends AbstractPage {
 //        form.addAction("show");
         
         view.setFocus("model.name");
-        view.setTitle("dataview.selection");
+        view.setTitle("dataview-selection");
         view.setNavbarActionEnabled("back", true);
         view.addContainer(container);
     }
@@ -260,31 +284,23 @@ public class Main extends AbstractPage {
      * @throws Exception
      */
     public final void save(ViewData vdata) throws Exception {
-        TableItem tableitem;
         String value;
         InputComponent input;
         DocumentModelItem modelitem;
-        Element cell;
         ExtendedObject object;
         String modelname = (String)vdata.getParameter("model.name");
         Documents documents = getDocuments();
         DocumentModel model = documents.getModel(modelname);
         Table table = ((Table)vdata.getElement("selection_view"));
         
-        for (Element element : table.getElements()) {
-            if (element.getType() != Const.TABLE_ITEM)
-                continue;
-            
-            tableitem = (TableItem)element;
+        for (TableItem item : table.getItens()) {
             object = null;
             
-            for (String name : tableitem.getElementNames()) {
-                cell = table.getElement(name);
-                
-                if (!cell.isDataStorable())
+            for (Element element: item.getElements()) {
+                if (!element.isDataStorable())
                     continue;
                 
-                input = (InputComponent)cell;
+                input = (InputComponent)element;
                 modelitem = input.getModelItem();
                 
                 value = input.getValue();
@@ -316,8 +332,8 @@ public class Main extends AbstractPage {
         ExtendedObject[] itens =
         		(ExtendedObject[])view.getParameter("model.regs");
         Documents documents = getDocuments();
-        DocumentModel model = documents.getModel(
-                (String)view.getParameter("model.name"));
+        String modelname = (String)view.getParameter("model.name");
+        DocumentModel model = documents.getModel(modelname);
         Table table = new Table(container, "selection_view");
         Const viewtype = (Const)view.getParameter("view.type");
         
@@ -345,6 +361,7 @@ public class Main extends AbstractPage {
 //        new Button(container, "laterpage").setSubmit(true);
 //        new Button(container, "lastpage").setSubmit(true);
         
+        view.setTitle(modelname);
         view.setNavbarActionEnabled("back", true);
         view.addContainer(container);
     }
@@ -353,14 +370,23 @@ public class Main extends AbstractPage {
      * 
      * @param vdata
      */
-    public final void show(ViewData vdata) {
-        String model = ((InputComponent)vdata.getElement("model.name")).
-                getValue();
+    public final void show(ViewData vdata) throws Exception {
+        ExtendedObject[] itens;
+        String modelname = ((InputComponent)vdata.
+                getElement("model.name")).getValue();
+        
+        try {
+            itens = getTableItens(modelname);
+        } catch (Exception e) {
+            vdata.message(Const.ERROR, e.getMessage());
+            return;
+        }
         
         vdata.clearParameters();
         vdata.addParameter("mode", "show");
         vdata.addParameter("view.type", Const.SINGLE);
-        vdata.addParameter("model.name", model);
+        vdata.addParameter("model.name", modelname);
+        vdata.export("model.regs", itens);
         vdata.setReloadableView(true);
         vdata.redirect(null, "select");
     }
