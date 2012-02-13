@@ -124,8 +124,8 @@ public class Main extends AbstractPage {
         
         form.importModel(model);
         form.setKeyRequired(true);
-        form.addAction("insertitem");
-        form.addAction("insertnext");
+        new Button(container, "insertitem");
+        new Button(container, "insertnext");
         
         vdata.setNavbarActionEnabled("back", true);
         vdata.addContainer(container);
@@ -269,7 +269,7 @@ public class Main extends AbstractPage {
         formitem.setSearchHelp(sh);
         formitem.setDataElement(dataelement);
         formitem.setObligatory(true);
-        form.addAction("edit");
+        new Button(container, "edit");
 //        form.addAction("show");
         
         view.setFocus("model.name");
